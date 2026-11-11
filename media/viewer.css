@@ -1,0 +1,75 @@
+/* Chat preview. Typography and spacing follow the Claude Code panel: 13px, bordered user box, dotted timeline. */
+:root {
+  --accent: #d97757;
+  --radius: 6px;
+  --border: var(--vscode-input-border, var(--vscode-panel-border));
+  --muted: var(--vscode-descriptionForeground);
+  --code-bg: var(--vscode-textCodeBlock-background);
+  --gap: 24px;
+  /* centres the 7px dot on the first 13px/1.6 text line */
+  --dot-top: calc((13px * 1.6 - 7px) / 2);
+}
+body { margin: 0; padding: 0 0 56px; font: 13px/1.6 var(--vscode-font-family); color: var(--vscode-foreground); background: var(--vscode-editor-background); }
+a { color: var(--vscode-textLink-foreground); }
+hr { margin: 16px 0 4px; border: none; border-top: 1px solid var(--vscode-panel-border); }
+.muted { color: var(--muted); }
+.center { text-align: center; }
+#top { padding: 8px; font-size: 12px; }
+#log { max-width: 780px; margin: 0 auto; padding: 28px 24px 24px; }
+
+/* messages */
+.msg { position: relative; margin: var(--gap) 0; overflow-wrap: anywhere; }
+.msg.user { margin: 40px 0; }
+.msg.assistant, .msg.tool, .msg.result, .msg.unsupported { padding-left: 36px; }
+.msg.unsupported { color: var(--muted); }
+.bubble { padding: 10px 14px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--vscode-input-background); }
+.time { position: absolute; right: 0; top: -16px; font-size: 11px; line-height: 1.2; color: var(--muted); }
+.msg p { margin: 0 0 12px; }
+.msg p:last-child { margin-bottom: 0; }
+.msg ul, .msg ol { margin: 4px 0 8px; padding-left: 20px; }
+.msg h1, .msg h2, .msg h3, .msg h4 { margin: 12px 0 6px; font-size: 13px; }
+pre { margin: 8px 0; padding: 10px 12px; overflow-x: auto; white-space: pre-wrap; font: 12px/1.45 var(--vscode-editor-font-family); border-radius: var(--radius); background: var(--code-bg); }
+code { font: 12px var(--vscode-editor-font-family); }
+:not(pre) > code { padding: 1px 4px; border-radius: 4px; background: var(--code-bg); }
+details.thinking { color: var(--muted); }
+details.thinking > summary { cursor: pointer; }
+
+/* timeline: a dot per assistant/tool message (green = tool call) and a line to the next dot */
+.msg.assistant::before, .msg.tool::before { content: ''; position: absolute; left: 10px; top: var(--dot-top); width: 7px; height: 7px; border-radius: 50%; background: var(--muted); opacity: .7; }
+.msg.tool::before { background: var(--vscode-charts-green); opacity: 1; }
+.msg.tool:has(.io.error)::before { background: var(--vscode-errorForeground); }
+:is(.msg.assistant, .msg.tool):has(+ :is(.msg.assistant, .msg.tool))::after { content: ''; position: absolute; left: 13px; top: calc(var(--dot-top) + 7px); bottom: calc(-1 * var(--gap) - var(--dot-top)); width: 1px; background: color-mix(in srgb, var(--vscode-foreground) 25%, transparent); }
+
+/* tool call: header, then IN and OUT boxes joined into one card (viewer.js moves OUT in; a lone OUT has no dot) */
+.tool-head { margin-bottom: 8px; }
+.tool-head .name { font-weight: 600; }
+.tool-head .arg { color: var(--muted); }
+.tool-call + .tool-call { margin-top: 12px; }
+.io { display: flex; gap: 12px; padding: 8px 12px; cursor: pointer; border: 1px solid var(--border); border-radius: var(--radius); background: var(--code-bg); }
+.io.in:has(+ .io.out) { border-radius: var(--radius) var(--radius) 0 0; }
+.io.in + .io.out { border-top: none; border-radius: 0 0 var(--radius) var(--radius); }
+.io-label { flex: none; width: 28px; font: 11px/18px var(--vscode-editor-font-family); color: var(--muted); }
+.io.error .io-label { color: var(--vscode-errorForeground); }
+.io-body { flex: 1; min-width: 0; max-height: 4.6em; overflow: hidden; mask-image: linear-gradient(#000 65%, transparent); }
+.io.open .io-body { max-height: none; mask-image: none; }
+.io pre { margin: 0; padding: 0; background: none; border-radius: 0; }
+
+/* buttons and bottom bar */
+button { display: inline-flex; align-items: center; gap: 6px; font: inherit; font-size: 12px; padding: 4px 12px; border: none; border-radius: var(--radius); cursor: pointer; color: #fff; background: var(--accent); }
+button:hover:not(:disabled) { filter: brightness(1.08); }
+button:disabled { opacity: .5; cursor: default; }
+button:focus-visible { outline: 1px solid var(--vscode-focusBorder); outline-offset: 1px; }
+button.full { color: var(--vscode-foreground); background: transparent; border: 1px solid var(--border); }
+button.full { margin: 2px 0 4px; padding: 2px 8px; }
+.icon { display: inline-flex; flex: none; }
+#bar { position: fixed; left: 0; right: 0; bottom: 0; display: flex; gap: 8px; align-items: center; padding: 8px 16px; font-size: 12px; background: var(--vscode-editor-background); border-top: 1px solid var(--vscode-panel-border); }
+#note { display: flex; align-items: center; justify-content: flex-end; gap: 5px; flex: 1; min-width: 0; color: var(--muted); white-space: nowrap; overflow: hidden; }
+
+/* code highlighting (highlight.js classes mapped to editor colours) */
+.hljs-keyword, .hljs-selector-tag, .hljs-literal { color: var(--vscode-symbolIcon-keywordForeground, #569cd6); }
+.hljs-string, .hljs-attr-value, .hljs-regexp { color: var(--vscode-debugTokenExpression-string, #ce9178); }
+.hljs-number { color: var(--vscode-debugTokenExpression-number, #b5cea8); }
+.hljs-comment { color: var(--muted); }
+.hljs-title, .hljs-title.function_ { color: var(--vscode-symbolIcon-functionForeground, #dcdcaa); }
+.hljs-built_in, .hljs-type { color: var(--vscode-symbolIcon-classForeground, #4ec9b0); }
+.hljs-attr, .hljs-variable, .hljs-property { color: var(--vscode-symbolIcon-variableForeground, #9cdcfe); }

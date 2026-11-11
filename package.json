@@ -1,0 +1,269 @@
+{
+  "name": "claude-hub",
+  "displayName": "Claude Hub",
+  "description": "Unofficial session browser for Claude Code: sessions grouped by project, search, and a read-only history viewer.",
+  "version": "0.1.0",
+  "preview": true,
+  "publisher": "levenwadim",
+  "icon": "media/icon.png",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/levenwadim/claude-hub-vs-code.git"
+  },
+  "bugs": {
+    "url": "https://github.com/levenwadim/claude-hub-vs-code/issues"
+  },
+  "homepage": "https://github.com/levenwadim/claude-hub-vs-code#readme",
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "keywords": [
+    "claude",
+    "claude code",
+    "anthropic",
+    "sessions",
+    "chat history",
+    "ai"
+  ],
+  "categories": [
+    "AI",
+    "Chat"
+  ],
+  "main": "./dist/extension.js",
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "extensionKind": [
+    "ui"
+  ],
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "claudeHub",
+          "title": "Claude Hub",
+          "icon": "media/icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "claudeHub": [
+        {
+          "id": "claudeHub.chats",
+          "name": "Sessions",
+          "type": "webview"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "claudeHub.newChat",
+        "title": "New Session",
+        "category": "Claude Hub"
+      },
+      {
+        "command": "claudeHub.search",
+        "title": "Search Sessions",
+        "category": "Claude Hub"
+      },
+      {
+        "command": "claudeHub.refresh",
+        "title": "Refresh",
+        "icon": "$(refresh)",
+        "category": "Claude Hub"
+      },
+      {
+        "command": "claudeHub.openMode.panel",
+        "title": "  Editor Tab"
+      },
+      {
+        "command": "claudeHub.openMode.panel.checked",
+        "title": "✓ Editor Tab"
+      },
+      {
+        "command": "claudeHub.openMode.sidebar",
+        "title": "  Sidebar"
+      },
+      {
+        "command": "claudeHub.openMode.sidebar.checked",
+        "title": "✓ Sidebar"
+      },
+      {
+        "command": "claudeHub.openMode.terminal",
+        "title": "  Terminal"
+      },
+      {
+        "command": "claudeHub.openMode.terminal.checked",
+        "title": "✓ Terminal"
+      },
+      {
+        "command": "claudeHub.markUnread",
+        "title": "Mark as unread"
+      },
+      {
+        "command": "claudeHub.markRead",
+        "title": "Mark as read"
+      }
+    ],
+    "submenus": [
+      {
+        "id": "claudeHub.openMode",
+        "label": "Open Sessions in"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "claudeHub.refresh",
+          "when": "view == claudeHub.chats",
+          "group": "navigation"
+        },
+        {
+          "submenu": "claudeHub.openMode",
+          "when": "view == claudeHub.chats",
+          "group": "1_settings"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "claudeHub.openMode.panel",
+          "when": "false"
+        },
+        {
+          "command": "claudeHub.openMode.panel.checked",
+          "when": "false"
+        },
+        {
+          "command": "claudeHub.openMode.sidebar",
+          "when": "false"
+        },
+        {
+          "command": "claudeHub.openMode.sidebar.checked",
+          "when": "false"
+        },
+        {
+          "command": "claudeHub.openMode.terminal",
+          "when": "false"
+        },
+        {
+          "command": "claudeHub.openMode.terminal.checked",
+          "when": "false"
+        },
+        {
+          "command": "claudeHub.markUnread",
+          "when": "false"
+        },
+        {
+          "command": "claudeHub.markRead",
+          "when": "false"
+        }
+      ],
+      "claudeHub.openMode": [
+        {
+          "command": "claudeHub.openMode.panel",
+          "when": "config.claudeHub.openMode != panel",
+          "group": "mode@1"
+        },
+        {
+          "command": "claudeHub.openMode.panel.checked",
+          "when": "config.claudeHub.openMode == panel",
+          "group": "mode@1"
+        },
+        {
+          "command": "claudeHub.openMode.sidebar",
+          "when": "config.claudeHub.openMode != sidebar",
+          "group": "mode@2"
+        },
+        {
+          "command": "claudeHub.openMode.sidebar.checked",
+          "when": "config.claudeHub.openMode == sidebar",
+          "group": "mode@2"
+        },
+        {
+          "command": "claudeHub.openMode.terminal",
+          "when": "config.claudeHub.openMode != terminal",
+          "group": "mode@3"
+        },
+        {
+          "command": "claudeHub.openMode.terminal.checked",
+          "when": "config.claudeHub.openMode == terminal",
+          "group": "mode@3"
+        }
+      ],
+      "webview/context": [
+        {
+          "command": "claudeHub.markUnread",
+          "when": "webviewId == 'claudeHub.chats' && webviewSection == 'session' && !unread"
+        },
+        {
+          "command": "claudeHub.markRead",
+          "when": "webviewId == 'claudeHub.chats' && webviewSection == 'session' && unread"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Claude Hub",
+      "properties": {
+        "claudeHub.openMode": {
+          "type": "string",
+          "enum": [
+            "panel",
+            "sidebar",
+            "terminal"
+          ],
+          "default": "sidebar",
+          "description": "Where to open a session.",
+          "enumDescriptions": [
+            "Claude Code editor tab",
+            "Claude Code sidebar (needs claudeCode.preferredLocation = \"sidebar\"; Hub asks before changing it)",
+            "`claude --resume <id>` in the integrated terminal"
+          ]
+        },
+        "claudeHub.openFolderInNewWindow": {
+          "type": "boolean",
+          "default": true,
+          "description": "When a session's folder differs from the current window, open it in a new window."
+        },
+        "claudeHub.claudeDir": {
+          "type": "string",
+          "default": "",
+          "description": "Claude config directory. Empty = ~/.claude."
+        },
+        "claudeHub.claudePath": {
+          "type": "string",
+          "default": "claude",
+          "description": "Path to the claude CLI (terminal mode)."
+        },
+        "claudeHub.activeThresholdSeconds": {
+          "type": "number",
+          "default": 15,
+          "minimum": 1,
+          "description": "A session counts as running if its file changed within this many seconds."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "build": "node esbuild.mjs",
+    "watch": "node esbuild.mjs --watch",
+    "typecheck": "tsc --noEmit",
+    "test:unit": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --disable-warning=ExperimentalWarning --test test/unit/*.test.ts",
+    "test:integration": "node esbuild.mjs && node test/integration/run.mjs",
+    "test": "npm run typecheck && npm run test:unit",
+    "package": "npm run build && vsce package --no-dependencies"
+  },
+  "dependencies": {
+    "highlight.js": "11.10.0",
+    "markdown-it": "14.3.3"
+  },
+  "devDependencies": {
+    "@types/markdown-it": "14.1.2",
+    "@types/node": "20.14.0",
+    "@types/vscode": "1.90.0",
+    "@vscode/test-electron": "^3.1.0",
+    "@vscode/vsce": "3.2.1",
+    "esbuild": "0.24.0",
+    "typescript": "5.6.3"
+  }
+}
